@@ -1,0 +1,6 @@
+gradio
+openai
+attrs
+cattrs
+pandas
+tqdm

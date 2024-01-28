@@ -1,0 +1,33 @@
+data_dir = "./data"
+sample = 8
+
+[[model]]
+# Entries other than `name` are passed to `openai.OpenAI` or `openai.OpenAI.chat.completion.create`
+name = "chatglm3-6b-sft-checkpoint100"
+base_url = "http://localhost:8000/v1"
+api_key = "dummy-key"
+max_retries = 1
+model = ""
+
+[[model]]
+name = "gpt-3.5"
+api_key = "sk-..."
+max_retries = 1
+model = "gpt-3.5-turbo"
+
+
+[[prompt]]
+name = "demo-sleep-zh"
+chat = """
+user: 睡不着怎么办？
+assistant: 你可以试试给我讲个故事呀。
+user: 诶嘿，那你想听什么样的故事呢？
+"""
+
+[[prompt]]
+name = "demo-sleep-en"
+chat = """
+user: What should I do if I can't fall asleep?
+assistant: Hmmm, maybe you can try telling me a story.
+user: lol, what kind of story do you like?
+"""
