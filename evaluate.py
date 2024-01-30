@@ -122,10 +122,12 @@ def ui(conf: Config):
             fn=on_decision,
             inputs=[completed_match, total_match],
             outputs=[candidate1, candidate2],
+            show_progress="minimal",
         ).then(
             progbar_update,
             inputs=[completed_match, total_match],
             outputs=[completed_match, progbar],
+            show_progress="hidden",
         )
         demo.load(
             init,
