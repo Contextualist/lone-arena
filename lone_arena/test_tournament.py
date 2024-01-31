@@ -1,5 +1,9 @@
-import pytest
 from .tournament import *
+
+import pytest
+
+from itertools import combinations
+from typing import cast
 
 
 @pytest.mark.parametrize("case", ["4", "16"])
@@ -20,11 +24,31 @@ def test_single_elimination(case):
     assert len(t.podium.players) == 3
 
 
-def test_pair_matches():
-    players = [(0, 1), (2, 3), (4, 5), (6, 7)]
-    t = pair_matches(players)
+def test_eliminate_half():
+    t = eliminate_half(list(range(8)))
     assert len(t.init_matches) == 4
     assert len(t.podium.players) == 4
+
+
+def test_pair_matches_2x3():
+    t = pair_matches([[0, 1, 2], [3, 4, 5]])
+    assert [m.players for m in t.init_matches] == [[0, 3], [1, 4], [2, 5]]
+    assert len(t.podium.players) == 3
+
+
+@pytest.mark.parametrize("case", ["2x3", "4x8", "5x8", "6x8", "6x12"])
+def test_pair_matches(case):
+    mgroup, nplayer = map(int, case.split("x"))
+    players: list[list[Player]] = [
+        [(i, j) for j in range(nplayer)] for i in range(mgroup)
+    ]
+    t = pair_matches(players)
+    assert len(t.init_matches) == mgroup * nplayer // 2
+    all_mtypes = set(combinations(range(mgroup), 2))
+    for m in t.init_matches:
+        i, j = cast(tuple[tuple, tuple], m.players)
+        all_mtypes -= {(i[0], j[0])}
+    assert not all_mtypes
 
 
 def test_run_tournament():

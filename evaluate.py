@@ -1,4 +1,4 @@
-from lone_arena.chatcup import Top3_1v1
+from lone_arena.chatcup import cup_factory
 from lone_arena.config import load_config, Config
 from lone_arena.files import DocumentDir, ResultDir
 from lone_arena.format import format_conversation
@@ -41,7 +41,7 @@ def main(conf: Config):
             print(msg)
             req_queue.put((msg, ""))
 
-    cup = Top3_1v1(pnames_todo, mnames, conf.sample, conf.top3_scores)
+    cup = cup_factory(pnames_todo, mnames, conf)
     todo_match, total_match = cup.nmatch(), cup.nmatch(len(pnames))
     prog_notify.put((total_match - todo_match, total_match))
     itournament = cup.run(compete)

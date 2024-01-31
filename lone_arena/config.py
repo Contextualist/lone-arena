@@ -36,6 +36,7 @@ class Prompt:
 @define
 class Config:
     data_dir: Path = Path("./data")
+    mode: str = "UNSET"
     sample: int = 8
     top3_scores: tuple[float, float, float] = (4.8, 3.2, 2.0)
     model: list[Model] = Factory(list)
@@ -44,6 +45,8 @@ class Config:
     def __attrs_post_init__(self):
         assert log2(self.sample).is_integer(), "config: sample must be power of 2"
         assert len(self.prompt) > 0, "config: expect at least 1 prompt"
+        if self.mode == "UNSET":
+            self.mode = "top3_1v1" if len(self.model) == 2 else "mle_elo"
 
 
 def load_config(fname: str) -> Config:

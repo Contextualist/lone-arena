@@ -5,6 +5,7 @@ from itertools import chain, batched
 import random
 from pathlib import Path
 import json
+from itertools import combinations
 from typing import Self, Callable, Protocol
 from collections.abc import Hashable
 
@@ -101,9 +102,51 @@ def single_elimination(players: list[Player]) -> Tournament:
     return Tournament(leaves, top3)
 
 
-def pair_matches(players: list[tuple[Player, Player]]) -> Tournament:
-    assert all(len(p) == 2 for p in players), "expect n pairs"
+def eliminate_half(players: list[Player]) -> Tournament:
     n = len(players)
-    winners = Podium.for_(n)
-    matches = [Match((winners, i), None, list(p)) for i, p in enumerate(players)]
+    assert n % 2 == 0, "expect even number of players"
+
+    winners = Podium.for_(n // 2)
+    matches = [
+        Match((winners, i), None, list(p)) for i, p in enumerate(batched(players, 2))
+    ]
     return Tournament(matches, winners)
+
+
+def pair_matches(
+    players: list[list[Player]], *, return_loser: bool = False
+) -> Tournament:
+    players = [list(p[::-1]) for p in players]  # reverse & clone
+    mgroup = len(players)
+    nplayer = len(players[0])
+    n_match = mgroup * nplayer // 2
+
+    p = Podium.for_(n_match * 2 if return_loser else n_match)
+    matches = []
+    # regular pairs
+    idx = 0
+    n_match_type = mgroup * (mgroup - 1) // 2
+    for i, j in combinations(range(mgroup), 2):
+        for _ in range(n_match // n_match_type):
+            w_to = (p, idx)
+            l_to = (p, idx + n_match) if return_loser else None
+            matches.append(Match(w_to, l_to, [players[i].pop(), players[j].pop()]))
+            idx += 1
+    # remaining pairs
+    i, j = 0, 1
+    while idx < n_match:
+        w_to = (p, idx)
+        l_to = (p, idx + n_match) if return_loser else None
+        while not players[i]:
+            i = (i + 1) % mgroup
+        pi = players[i].pop()
+        while not players[j]:
+            j = (j + 1) % mgroup
+        pj = players[j].pop()
+        if i == j:
+            raise RuntimeError("a remaining pair is from the same group")
+        matches.append(Match(w_to, l_to, [pi, pj]))
+        idx += 1
+        i, j = (i + 1) % mgroup, (j + 1) % mgroup
+
+    return Tournament(matches, p)

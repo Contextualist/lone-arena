@@ -3,4 +3,6 @@ openai
 attrs
 cattrs
 pandas
+numpy
+scikit-learn
 tqdm
