@@ -21,11 +21,14 @@ class DocumentDir:
         d.mkdir(exist_ok=True, parents=True)
         return d
 
+    def sanitize_name(self, name):
+        return name.replace(':', '_')
+
     def load(self, prompt_names: list[str], model_names: list[str]) -> Documents:
         docs = {}
         for pname in prompt_names:
             for mname in model_names:
-                with (self.doc_dir / pname / f"{mname}.jsonl").open("r") as fi:
+                with (self.doc_dir / pname / f"{self.sanitize_name(mname)}.jsonl").open("r") as fi:
                     for i, line in enumerate(fi):
                         docs[(pname, mname, i)] = json.loads(line)
         return docs
@@ -33,7 +36,7 @@ class DocumentDir:
     def dump(self, msg_list: list[Messages], prompt_name: str, model_name: str):
         pdir = self.doc_dir / prompt_name
         pdir.mkdir(exist_ok=True)
-        with (pdir / f"{model_name}.jsonl").open("w") as fo:
+        with (pdir / f"{self.sanitize_name(model_name)}.jsonl").open("w") as fo:
             for msg in msg_list:
                 json.dump(msg, fo, ensure_ascii=False)
                 print(file=fo)
