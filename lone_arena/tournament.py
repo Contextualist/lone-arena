@@ -1,20 +1,27 @@
 from attrs import define, Factory, NOTHING as TBD
 
 from math import log2
-from itertools import chain, batched
+from itertools import chain
 import random
 from pathlib import Path
 import json
-from itertools import combinations
-from typing import Self, Callable, Protocol
+from itertools import combinations, islice
+from typing import Self, Callable, Protocol, TypeAlias
 from collections.abc import Hashable
 
-type Player = Hashable
+Player: TypeAlias = Hashable
 
 
 class PlayerBox(Protocol):
     players: list[Player]
 
+def batched(iterable, n):
+    it = iter(iterable)
+    while True:
+        batch = list(islice(it, n))
+        if not batch:
+            return
+        yield batch
 
 @define
 class Match:

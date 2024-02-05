@@ -1,13 +1,14 @@
 from .tournament import Podium, Player
 
 from attrs import define
+from typing import TypeAlias
 
 from pathlib import Path
 from functools import cached_property
 import json
 
-type Messages = list[dict]
-type Documents = dict[Player, Messages]
+Messages: TypeAlias = list[dict]
+Documents: TypeAlias = dict[Player, Messages]
 
 
 @define(slots=False)
