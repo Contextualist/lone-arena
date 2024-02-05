@@ -15,7 +15,7 @@ def parse_chat(chat: str) -> list[dict]:
     msg = []
     for li in chat.splitlines():
         if (m := ROLE_TAG.match(li)) is not None:
-            msg.append({"role": m.group(1), "content": m.group(2)})
+            msg.append({"role": m.group(1), "content": m.group(2).replace('\\n', "\n")})
             continue
         assert len(msg) > 0, f"missing role tag for {chat!r}"
         msg[-1]["content"] += "\n" + li
